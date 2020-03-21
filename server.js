@@ -6,12 +6,10 @@ const hubsRouter = require('./hubs/hubs-router.js')
 
 const app = express()
 
-
-// built in middleware
-app.use(express.json())
-
-// 3rd part middleware
-app.use(helmet())
+// global middleware
+// app.use(morgan('dev')) // 3rd paty middleware: must nmp install
+app.use(helmet()) // 3rd part middleware: must nmp install
+app.use(express.json()) // built in middleware: no need to npm install
 
 // custom middleware
 app.use(methodLogger)
@@ -25,13 +23,16 @@ app.get('/', (req, res) => {
 
   res.send(`
     <h2>Lambda Hubs API</h2>
-    <p>Welcome${nameInsert} to the Lambda Hubs API</p>
+    <p>Welcome ${nameInsert} to the Lambda Hubs API</p>
     `);
 });
 
-function methodLogger(req, res, next) {
-  console.log(`${req.method} Request`)
-  next()
+function methodLogger(req, res, next) { // The three Amigas
+  const method = req.method
+  const endpoint = req.originalURL
+
+  console.log(`${method} to ${endpoint}`)
+  next() // moves the request to the next middleware
 }
 
 function addName(req, res, next) {
